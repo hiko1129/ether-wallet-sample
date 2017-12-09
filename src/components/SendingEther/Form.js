@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Panel, Button } from 'react-bootstrap'
 import FieldGroup from '../common/FieldGroup'
+import CustomizedModal from './CustomizedModal'
 import BigNumber from 'bignumber.js'
 
 class Form extends Component {
@@ -9,6 +10,8 @@ class Form extends Component {
     super(props)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleChange = this.handleChange.bind(this)
+    this.closeModal = this.closeModal.bind(this)
+    this.submitChange = this.submitChange.bind(this)
     this.state = {
       from: '',
       to: '',
@@ -59,7 +62,14 @@ class Form extends Component {
     this.setState(state)
   }
 
+  closeModal() {
+    this.setState({ showingModal: false })
+  }
+
+  submitChange() {}
+
   render() {
+    const { showingModal } = this.state
     return (
       <div>
         <Panel bsStyle="primary" header="Send Ether">
@@ -104,6 +114,11 @@ class Form extends Component {
             </Button>
           </form>
         </Panel>
+        <CustomizedModal
+          isShowing={showingModal}
+          onClose={this.closeModal}
+          onSubmit={this.submitChange}
+        />
       </div>
     )
   }
