@@ -6,24 +6,33 @@ import QRCode from 'qrcode.react'
 class AccountStatus extends Component {
   constructor(props) {
     super(props)
-    this.getAccounts = this.getAccounts.bind(this)
+    this.getAccountsInfo = this.getAccountsInfo.bind(this)
     this.state = {
       accountsInfo: null
     }
   }
 
   async getBalance(address) {
-    const balance = await this.props.web3.eth.getBalance(
-      address,
-      (err, balance) => {
-        return balance
-      }
-    )
+    const { web3 } = this.props
+    const balance = await web3.eth.getBalance(address, (err, balance) => {
+      return balance
+    })
 
-    return balance
+    const balanceEth = web3.utils.fromWei(balance, 'ether')
+    return parseFloat(balanceEth).toFixed(3)
   }
 
-  async getAccounts() {
+  async getName(address, index) {
+    const { web3 } = this.props
+    const name =
+      (await web3.eth.getCoinbase()) === address.toLowerCase()
+        ? `Main Account(Account${index})`
+        : `Account${index}`
+
+    return name
+  }
+
+  async getAccountsInfo() {
     const { web3 } = this.props
     const accounts = await web3.eth.getAccounts((err, accounts) => {
       return accounts
@@ -31,10 +40,7 @@ class AccountStatus extends Component {
     const accountsInfo = []
     for (const [index, address] of accounts.entries()) {
       const balance = await this.getBalance(address)
-      const name =
-        (await web3.eth.getCoinbase()) === address
-          ? 'Main Account(Etherbase)'
-          : `Account${index}`
+      const name = await this.getName(address, index)
       accountsInfo.push({
         name: name,
         address: address,
@@ -45,7 +51,7 @@ class AccountStatus extends Component {
   }
 
   render() {
-    this.getAccounts()
+    this.getAccountsInfo()
     const { accountsInfo } = this.state
     return (
       <div>

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Web3 from 'web3'
 import AccountStatus from './components/AccountStatus'
-import SendingEther from './components/SendingEther'
+import SendingEther from './components/SendingEther/Form'
 import 'bootstrap/dist/css/bootstrap.css'
 import { Navbar, Nav, NavItem, Grid, Row, Col } from 'react-bootstrap'
 
@@ -13,11 +13,10 @@ class App extends Component {
   }
 
   getWeb3() {
+    const web3 = new Web3()
     return typeof window.web3 !== 'undefined'
       ? new Web3(window.web3.currentProvider)
-      : new Web3(
-          new window.web3.providers.HttpProvider('http://localhost:8545')
-        )
+      : new Web3(new web3.providers.HttpProvider('http://localhost:8545'))
   }
 
   componentDidMount() {

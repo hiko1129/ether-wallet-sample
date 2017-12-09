@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "bignumber.js": "^5.0.0",
     "bootstrap": "^3.3.7",
     "prop-types": "^15.6.0",
     "qrcode.react": "^0.7.2",
