@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Panel, Table } from 'react-bootstrap'
+import { Table } from 'react-bootstrap'
+import QRCode from 'qrcode.react'
 
 class AccountStatus extends Component {
   constructor(props) {
@@ -66,6 +67,9 @@ class AccountStatus extends Component {
                       <td>{account.name}</td>
                       <td>{account.address}</td>
                       <td>{account.balance}</td>
+                      <td>
+                        <QRCode value={account.address} size={64} />
+                      </td>
                     </tr>
                   )
                 })}
