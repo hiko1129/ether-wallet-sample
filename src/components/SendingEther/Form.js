@@ -1,6 +1,12 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Panel, Button } from 'react-bootstrap'
+import {
+  Panel,
+  Button,
+  FormGroup,
+  ControlLabel,
+  FormControl
+} from 'react-bootstrap'
 import FieldGroup from '../common/FieldGroup'
 import CustomizedModal from './CustomizedModal'
 import BigNumber from 'bignumber.js'
@@ -21,8 +27,14 @@ class Form extends Component {
         estimatedGas: 0,
         currentGasPrice: 0
       },
-      showingModal: false
+      showingModal: false,
+      accounts: null
     }
+  }
+
+  async componentDidMount() {
+    const accounts = await this.getAccounts()
+    this.setState({ accounts, from: accounts[0] })
   }
 
   async getAccounts() {
@@ -88,7 +100,7 @@ class Form extends Component {
   }
 
   render() {
-    const { showingModal, from, to, amount } = this.state
+    const { showingModal, from, to, amount, accounts } = this.state
     const { web3 } = this.props
     const fee = web3.utils
       .fromWei(this.estimatedFeeInWei().toString(10), 'ether')
@@ -97,14 +109,21 @@ class Form extends Component {
       <div>
         <Panel bsStyle="primary" header="Send Ether">
           <form onSubmit={this.handleSubmit}>
-            <FieldGroup
-              id="formControlsText"
-              type="text"
-              label="From"
-              placeholder="0x1234abcdef...."
-              name="from"
-              onChange={e => this.handleChange(e)}
-            />
+            <FormGroup controlId="formControlsSelect">
+              <ControlLabel>From</ControlLabel>
+              <FormControl
+                componentClass="select"
+                placeholder="Address"
+                onChange={e => this.handleChange(e)}
+                name="from">
+                {!!accounts &&
+                  accounts.map((account, index) => (
+                    <option key={index} value={account}>
+                      {account}
+                    </option>
+                  ))}
+              </FormControl>
+            </FormGroup>
             <FieldGroup
               id="formControlsText"
               type="text"
