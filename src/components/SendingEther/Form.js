@@ -10,18 +10,19 @@ class Form extends Component {
     super(props)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.handleChange = this.handleChange.bind(this)
+    this.estimatedFeeInWei = this.estimatedFeeInWei.bind(this)
     this.closeModal = this.closeModal.bind(this)
     this.submitChange = this.submitChange.bind(this)
     this.state = {
       from: '',
       to: '',
-      amount: 0.0,
+      amount: '0',
       password: '',
       sendEther: {
         estimatedGas: 0,
         currentGasPrice: 0
       },
-      showingModal: true
+      showingModal: false
     }
   }
 
@@ -46,13 +47,13 @@ class Form extends Component {
     if (!accounts.includes(from)) return
 
     // 必要Gas量の見積もりをEthereumノードに問い合わせ→ Session変数に格納
-    web3.eth.estimateGas({ from, to, value: amount }, (err, estimatedGas) => {
-      this.setState({ sendEther: { estimatedGas } })
-    })
+    const estimatedGas = await web3.eth.estimateGas({ from, to, value: amount })
 
     // 現在のGas priceをEthereumノードに問い合わせ問い合わせ→ Session変数に格納
-    web3.eth.getGasPrice((err, gasPrice) => {
-      this.setState({ sendEther: { gasPrice } })
+    const currentGasPrice = await web3.eth.getGasPrice()
+    this.setState({
+      sendEther: { estimatedGas, currentGasPrice },
+      showingModal: true
     })
   }
 
@@ -66,10 +67,35 @@ class Form extends Component {
     this.setState({ showingModal: false })
   }
 
-  submitChange() {}
+  async submitChange() {
+    const { web3 } = this.props
+    const { from, to, amount, password } = this.state
+    try {
+      await web3.eth.personal.unlockAccount(from, password, 0)
+    } catch (e) {
+      alert('Unlock failed')
+    }
+
+    try {
+      await web3.eth.sendTransaction({
+        from,
+        to,
+        value: web3.utils.toWei(amount, 'ether')
+      })
+      alert('Ether Transfer Succeeded')
+    } catch (e) {
+      alert('Ether Transfer Failed')
+    }
+
+    this.setState({ showingModal: false })
+  }
 
   render() {
-    const { showingModal } = this.state
+    const { showingModal, from, to, amount } = this.state
+    const { web3 } = this.props
+    const fee = web3.utils
+      .fromWei(this.estimatedFeeInWei().toString(10), 'ether')
+      .toString(10)
     return (
       <div>
         <Panel bsStyle="primary" header="Send Ether">
@@ -115,6 +141,10 @@ class Form extends Component {
           </form>
         </Panel>
         <CustomizedModal
+          from={from}
+          to={to}
+          amount={amount}
+          fee={fee}
           isShowing={showingModal}
           onClose={this.closeModal}
           onSubmit={this.submitChange}

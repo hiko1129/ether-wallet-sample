@@ -24,7 +24,7 @@ class App extends Component {
       this.setState({
         web3: this.getWeb3()
       })
-    }, 30000)
+    }, 5000)
   }
 
   render() {

@@ -7,29 +7,40 @@ class CustomizedModal extends Component {
     super(props)
     this.handleClose = this.handleClose.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.state = { isSending: false }
   }
 
   handleClose() {
     this.props.onClose()
   }
 
-  handleSubmit() {
-    this.props.onSubmit()
+  async handleSubmit() {
+    this.setState({ isSending: true })
+    await this.props.onSubmit()
+    this.setState({ isSending: false })
   }
 
   render() {
-    const { isShowing } = this.props
+    const { isShowing, from, to, amount, fee } = this.props
+    const { isSending } = this.state
     return (
       <div>
         <Modal show={isShowing} onHide={this.handleClose}>
           <Modal.Header closeButton>
-            <Modal.Title>Modal heading</Modal.Title>
+            <Modal.Title>Confirmation</Modal.Title>
           </Modal.Header>
-          <Modal.Body>test</Modal.Body>
+          <Modal.Body>
+            <ul>
+              <li>from: {from}</li>
+              <li>to: {to}</li>
+              <li>amount: {amount}</li>
+              <li>fee: {fee}</li>
+            </ul>
+          </Modal.Body>
           <Modal.Footer>
             <Button onClick={this.handleClose}>Close</Button>
             <Button bsStyle="primary" onClick={this.handleSubmit}>
-              Save changes
+              {isSending ? 'Sending...' : 'Send'}
             </Button>
           </Modal.Footer>
         </Modal>
@@ -39,6 +50,10 @@ class CustomizedModal extends Component {
 }
 
 CustomizedModal.propTypes = {
+  from: PropTypes.string.isRequired,
+  to: PropTypes.string.isRequired,
+  amount: PropTypes.string.isRequired,
+  fee: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isShowing: PropTypes.bool.isRequired
