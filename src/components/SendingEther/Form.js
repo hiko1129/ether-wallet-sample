@@ -17,7 +17,6 @@ class Form extends Component {
       from: '',
       to: '',
       amount: '0',
-      password: '',
       sendEther: {
         estimatedGas: 0,
         currentGasPrice: 0
@@ -46,10 +45,14 @@ class Form extends Component {
 
     if (!accounts.includes(from)) return
 
-    // 必要Gas量の見積もりをEthereumノードに問い合わせ→ Session変数に格納
-    const estimatedGas = await web3.eth.estimateGas({ from, to, value: amount })
+    // 必要Gas量の見積もりをEthereumノードに問い合わせ
+    const estimatedGas = await web3.eth.estimateGas({
+      from,
+      to,
+      value: web3.utils.toWei(amount, 'ether')
+    })
 
-    // 現在のGas priceをEthereumノードに問い合わせ問い合わせ→ Session変数に格納
+    // 現在のGas priceをEthereumノードに問い合わせ問い合わせ
     const currentGasPrice = await web3.eth.getGasPrice()
     this.setState({
       sendEther: { estimatedGas, currentGasPrice },
@@ -69,13 +72,7 @@ class Form extends Component {
 
   async submitChange() {
     const { web3 } = this.props
-    const { from, to, amount, password } = this.state
-    try {
-      await web3.eth.personal.unlockAccount(from, password, 0)
-    } catch (e) {
-      alert('Unlock failed')
-    }
-
+    const { from, to, amount } = this.state
     try {
       await web3.eth.sendTransaction({
         from,
@@ -122,13 +119,6 @@ class Form extends Component {
               label="Amount(ETH)"
               name="amount"
               placeholder="0.0"
-              onChange={e => this.handleChange(e)}
-            />
-            <FieldGroup
-              id="formControlsPassword"
-              label="Password"
-              type="password"
-              name="password"
               onChange={e => this.handleChange(e)}
             />
             <Button
