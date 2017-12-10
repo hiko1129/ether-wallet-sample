@@ -12,6 +12,12 @@ class AccountStatus extends Component {
     }
   }
 
+  componentDidMount() {
+    setInterval(() => {
+      this.getAccountsInfo()
+    }, 1000)
+  }
+
   async getBalance(address) {
     const { web3 } = this.props
     const balance = await web3.eth.getBalance(address, (err, balance) => {
@@ -51,7 +57,6 @@ class AccountStatus extends Component {
   }
 
   render() {
-    this.getAccountsInfo()
     const { accountsInfo } = this.state
     return (
       <div>

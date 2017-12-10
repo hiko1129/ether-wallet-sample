@@ -19,14 +19,6 @@ class App extends Component {
       : new Web3(new web3.providers.HttpProvider('http://localhost:8545'))
   }
 
-  componentDidMount() {
-    setInterval(() => {
-      this.setState({
-        web3: this.getWeb3()
-      })
-    }, 5000)
-  }
-
   render() {
     return (
       <div>
