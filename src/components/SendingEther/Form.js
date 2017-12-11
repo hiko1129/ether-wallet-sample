@@ -9,6 +9,7 @@ import {
 } from 'react-bootstrap'
 import FieldGroup from '../common/FieldGroup'
 import CustomizedModal from './CustomizedModal'
+import CustomizedQrReader from './CustomizedQrReader'
 import BigNumber from 'bignumber.js'
 
 class Form extends Component {
@@ -19,6 +20,7 @@ class Form extends Component {
     this.estimatedFeeInWei = this.estimatedFeeInWei.bind(this)
     this.closeModal = this.closeModal.bind(this)
     this.submitChange = this.submitChange.bind(this)
+    this.setDestinationAddress = this.setDestinationAddress.bind(this)
     this.state = {
       from: '',
       to: '',
@@ -82,6 +84,10 @@ class Form extends Component {
     this.setState({ showingModal: false })
   }
 
+  setDestinationAddress(to) {
+    this.setState({ to })
+  }
+
   async submitChange() {
     const { web3 } = this.props
     const { from, to, amount } = this.state
@@ -107,6 +113,7 @@ class Form extends Component {
       .toString(10)
     return (
       <div>
+        {!to && <CustomizedQrReader handleScan={this.setDestinationAddress} />}
         <Panel bsStyle="primary" header="Send Ether">
           <form onSubmit={this.handleSubmit}>
             <FormGroup controlId="formControlsSelect">
@@ -129,6 +136,7 @@ class Form extends Component {
               type="text"
               label="To"
               name="to"
+              value={to}
               placeholder="0x1234abcdef...."
               onChange={e => this.handleChange(e)}
             />
